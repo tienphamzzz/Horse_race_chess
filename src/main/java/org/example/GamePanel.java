@@ -17,6 +17,7 @@ public class GamePanel extends JPanel implements Runnable{
     Mouse mouse = new Mouse();
     Dice dice = new Dice();
     Horse selectedHorse = null;
+    JButton button = new JButton("Roll dice");
 
     public GamePanel() {
         setPreferredSize(new Dimension(WIDTH, HEIGHT));
@@ -27,9 +28,12 @@ public class GamePanel extends JPanel implements Runnable{
         setHorses();
 
         this.setLayout(null);
-        JButton button = new JButton("Roll dice");
+
         button.setBounds(17 * Board.SQUARE_SIZE + Board.HALF_SQUARE_SIZE + Board.PADDING, 8 * Board.SQUARE_SIZE + Board.PADDING, Board.SQUARE_SIZE * 2, Board.HALF_SQUARE_SIZE);
-        button.addActionListener(e -> dice.rollWithAnimation(this));
+        button.addActionListener(e -> {
+            dice.rollWithAnimation(this);
+            button.setEnabled(false); // Disable the button after rolling
+        });
         this.add(button);
     }
     public void launchGame() {
@@ -43,24 +47,21 @@ public class GamePanel extends JPanel implements Runnable{
         horses.add(new BlueHorse(1,4));
         horses.add(new BlueHorse(4,4));
         // Draw Green Horses
-        horses.add(new GreenHorse(1,10));
-        horses.add(new GreenHorse(4,10));
-        horses.add(new GreenHorse(1,13));
-        horses.add(new GreenHorse(4,13));
+        horses.add(new GreenHorse(10,1));
+        horses.add(new GreenHorse(13,1));
+        horses.add(new GreenHorse(10,4));
+        horses.add(new GreenHorse(13,4));
         // Draw Red Horses
-        horses.add(new RedHorse(10,1));
-        horses.add(new RedHorse(13,1));
-        horses.add(new RedHorse(10,4));
-        horses.add(new RedHorse(13,4));
+        horses.add(new RedHorse(1,10));
+        horses.add(new RedHorse(4,10));
+        horses.add(new RedHorse(1,13));
+        horses.add(new RedHorse(4,13));
         // Draw Yellow Horses
         horses.add(new YellowHorse(10,13));
         horses.add(new YellowHorse(13,13));
         horses.add(new YellowHorse(10,10));
         horses.add(new YellowHorse(13,10));
     }
-//    public void setDice(){
-//        dice.
-//    }
     private void update() {
         if (mouse.pressed) {
             if (selectedHorse == null) {
@@ -68,6 +69,8 @@ public class GamePanel extends JPanel implements Runnable{
                     if (horse.team_color == current_turn && horse.x < mouse.x && horse.x + Board.SQUARE_SIZE > mouse.x &&
                             horse.y < mouse.y && horse.y + Board.SQUARE_SIZE > mouse.y) {
                         selectedHorse = horse;
+                        selectedHorse.oldRow = selectedHorse.row;
+                        selectedHorse.oldCol = selectedHorse.col;
                         break;
                     }
                 }
@@ -76,12 +79,38 @@ public class GamePanel extends JPanel implements Runnable{
             }
         }
 
-        if (mouse.pressed == false){
-            if (selectedHorse != null){
-                selectedHorse.updatePosition();
+        if (!mouse.pressed) {
+            if (selectedHorse != null) {
+                if (selectedHorse.isWithInTheBoard(selectedHorse.row, selectedHorse.col)) {
+                    selectedHorse.updatePosition();
+                    selectedHorse.oldRow = selectedHorse.row;
+                    selectedHorse.oldCol = selectedHorse.col;
+                    changePlayer();
+                } else {
+                    selectedHorse.moveTo(selectedHorse.getX(selectedHorse.oldRow), selectedHorse.getY(selectedHorse.oldCol));
+                    selectedHorse.row = selectedHorse.oldRow;
+                    selectedHorse.col = selectedHorse.oldCol;
+                }
                 selectedHorse = null;
             }
         }
+    }
+    private void changePlayer(){
+        if (current_turn == 1){
+            current_turn = 2;
+        }
+        else if (current_turn == 2){
+            current_turn = 3;
+        }
+        else if (current_turn == 3){
+            current_turn = 4;
+        }
+        else if (current_turn == 4){
+            current_turn = 1;
+        }
+        System.out.println("Current turn: " + current_turn);
+        selectedHorse = null;
+        button.setEnabled(true);
     }
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
@@ -101,6 +130,23 @@ public class GamePanel extends JPanel implements Runnable{
             g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1.0f));
 
             selectedHorse.draw(g2);
+        }
+
+        // Draw current turn
+        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        g2.setFont(new Font("Book Antiqua", Font.PLAIN, 30));
+        g2.setColor(Color.BLACK);
+        if(current_turn == 1){
+            g2.drawString("Your turn", 85 + Board.PADDING, 155 + Board.PADDING);
+        }
+        else if(current_turn == 2){
+            g2.drawString("Your turn", 85 + Board.PADDING, 605 + Board.PADDING);
+        }
+        else if(current_turn == 3){
+            g2.drawString("Your turn", 540 + Board.PADDING, 605 + Board.PADDING);
+        }
+        else if(current_turn == 4){
+            g2.drawString("Your turn", 540 + Board.PADDING, 155 + Board.PADDING);
         }
     }
 

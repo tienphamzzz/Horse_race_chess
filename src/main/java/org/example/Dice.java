@@ -21,9 +21,8 @@ public class Dice {
         rolling = true;
         Timer timer = new Timer(100, e -> {
             value = random.nextInt(SIDES) + 1;
-            panel.repaint(); // Vẽ lại giao diện sau mỗi lần đổi giá trị
+            panel.repaint();
 
-            // Giảm tốc dần và dừng lại
             ((Timer) e.getSource()).setDelay(((Timer) e.getSource()).getDelay() + 50);
             if (((Timer) e.getSource()).getDelay() >= 600) {
                 ((Timer) e.getSource()).stop();

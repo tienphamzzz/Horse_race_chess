@@ -27,9 +27,6 @@ public class Board {
                 int y = row * SQUARE_SIZE + PADDING;
 
                 if ((6 <= row && row <= 8) || (6 <= col && col <= 8)) {
-//                    g2.setColor(Color.WHITE);
-//                    g2.drawRect(x, y, SQUARE_SIZE, SQUARE_SIZE);
-
                     Color circleColor = getCircleColor(row, col);
                     if (circleColor != null) {
                         g2.setColor(circleColor);

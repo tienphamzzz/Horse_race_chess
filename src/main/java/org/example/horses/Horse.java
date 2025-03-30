@@ -11,12 +11,18 @@ public class Horse {
     public int team_color;
     public int x, y;
     public int row, col;
+    public int oldRow, oldCol;
+    public int cageRow, cageCol;
 
     public Horse(int row, int col) {
         this.row = row;
         this.col = col;
         x = getX(col);
         y = getY(row);
+        this.oldRow = row;
+        this.oldCol = col;
+        this.cageRow = row;
+        this.cageCol = col;
     }
 
     public BufferedImage getImage(String path) {
@@ -38,9 +44,28 @@ public class Horse {
         this.row = getRow(newX);
         this.col = getCol(newY);
     }
+    public boolean canMove(int targetRow, int targetCol){
+        return false;
+    }
+    public boolean isWithInTheBoard(int row, int col) {
+        int[][] validPositions = {
+                {6, 0}, {6, 1}, {6, 2}, {6, 3}, {6, 4}, {6, 5}, {6, 6}, {5, 6}, {4, 6}, {3, 6}, {2, 6}, {1, 6}, {0, 6},
+                {0, 7}, {0, 8}, {1, 8}, {2, 8}, {3, 8}, {4, 8}, {5, 8}, {6, 8}, {6, 9}, {6, 10}, {6, 11}, {6, 12}, {6, 13},
+                {6, 14}, {7, 14}, {8, 14}, {8, 13}, {8, 12}, {8, 11}, {8, 10}, {8, 9}, {8, 8}, {9, 8}, {10, 8}, {11, 8},
+                {12, 8}, {13, 8}, {14, 8}, {14, 7}, {14, 6}, {13, 6}, {12, 6}, {11, 6}, {10, 6}, {9, 6}, {8, 6}, {8, 5},
+                {8, 4}, {8, 3}, {8, 2}, {8, 1}, {8, 0}, {7, 0}
+        };
+
+        for (int[] pos : validPositions) {
+            if (pos[0] == row && pos[1] == col) {
+                return true;
+            }
+        }
+        return false;
+    }
     public void updatePosition() {
-        x = getX(col);
-        y = getY(row);
+        x = getX(row);
+        y = getY(col);
     }
     public int getRow(int x){
         return (x + Board.HALF_SQUARE_SIZE - Board.PADDING) / Board.SQUARE_SIZE;
@@ -48,11 +73,11 @@ public class Horse {
     public int getCol(int y){
         return (y + Board.HALF_SQUARE_SIZE - Board.PADDING) / Board.SQUARE_SIZE;
     }
-    private int getY(int row) {
+    public int getY(int col) {
         return col * Board.SQUARE_SIZE + Board.PADDING;
     }
 
-    private int getX(int col) {
+    public int getX(int row) {
         return row * Board.SQUARE_SIZE + Board.PADDING;
     }
 }
