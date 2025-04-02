@@ -16,9 +16,14 @@ public class Dice {
         rolling = false;
     }
 
+    public int getValue() {
+        return value;
+    }
+
     // Hiệu ứng tung xúc xắc
-    public void rollWithAnimation(JPanel panel) {
+    public void rollWithAnimation(JPanel panel, JButton button, Runnable callback) {
         rolling = true;
+        button.setEnabled(false); // Disable the button at the start of the animation
         Timer timer = new Timer(100, e -> {
             value = random.nextInt(SIDES) + 1;
             panel.repaint();
@@ -27,6 +32,8 @@ public class Dice {
             if (((Timer) e.getSource()).getDelay() >= 600) {
                 ((Timer) e.getSource()).stop();
                 rolling = false;
+//                button.setEnabled(true); // Re-enable the button at the end of the animation
+                callback.run(); // Call the callback after animation completes
             }
         });
         timer.start();

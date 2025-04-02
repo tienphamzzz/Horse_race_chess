@@ -13,18 +13,23 @@ public class Horse {
     public int row, col;
     public int oldRow, oldCol;
     public int cageRow, cageCol;
+    public int cageDoorRow, cageDoorCol;
+    public int startRow, startCol;
+    public int[][] path;
+    public int[][] cagePath;
+    public int currentPathIndex = 0;
+    public int currentCagePathIndex = 0;
 
     public Horse(int row, int col) {
         this.row = row;
         this.col = col;
-        x = getX(col);
-        y = getY(row);
+        x = getX(row);
+        y = getY(col);
         this.oldRow = row;
         this.oldCol = col;
         this.cageRow = row;
         this.cageCol = col;
     }
-
     public BufferedImage getImage(String path) {
         BufferedImage image = null;
         try {
@@ -44,8 +49,8 @@ public class Horse {
         this.row = getRow(newX);
         this.col = getCol(newY);
     }
-    public boolean canMove(int targetRow, int targetCol){
-        return false;
+    public boolean isInStart() {
+        return row == startRow && col == startCol;
     }
     public boolean isWithInTheBoard(int row, int col) {
         int[][] validPositions = {
@@ -57,6 +62,20 @@ public class Horse {
         };
 
         for (int[] pos : validPositions) {
+            if (pos[0] == row && pos[1] == col) {
+                return true;
+            }
+        }
+        return false;
+    }
+    public boolean isInCage(int row, int col) {
+        return row == cageRow && col == cageCol;
+    }
+    public boolean isInCageDoor(int row, int col) {
+        return row == cageDoorRow && col == cageDoorCol;
+    }
+    public boolean isInCagePath(int row, int col) {
+        for (int[] pos : cagePath) {
             if (pos[0] == row && pos[1] == col) {
                 return true;
             }
