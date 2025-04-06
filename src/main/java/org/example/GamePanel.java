@@ -20,6 +20,7 @@ public class GamePanel extends JPanel implements Runnable{
     JButton button = new JButton("Roll dice");
     private boolean diceRolled = false;
     private int[][] cachedTargetPosition;
+    private boolean gameOver;
 
     public GamePanel() {
         setPreferredSize(new Dimension(WIDTH, HEIGHT));
@@ -60,6 +61,8 @@ public class GamePanel extends JPanel implements Runnable{
         horses.add(new YellowHorse(13,13));
         horses.add(new YellowHorse(10,10));
         horses.add(new YellowHorse(13,10));
+        //Draw test horses
+        horses.add(new BlueHorse(7, 0, 1));
     }
     private void update() {
         if (mouse.pressed && diceRolled) {
@@ -80,45 +83,101 @@ public class GamePanel extends JPanel implements Runnable{
         }
         if (!mouse.pressed) {
             if (selectedH != null) {
-                if (selectedH.isWithInTheBoard(selectedH.row, selectedH.col) && isValidTargetPosition(selectedH, cachedTargetPosition)) {
+                if ((selectedH.isWithInTheBoard(selectedH.row, selectedH.col) || selectedH.isInCagePath(selectedH.row, selectedH.col))
+                         && isHorseCorrectPosition(selectedH, cachedTargetPosition)) {
                     selectedH.updatePosition();
                     selectedH.oldRow = selectedH.row;
                     selectedH.oldCol = selectedH.col;
-                    if(!selectedH.isInStart()){
+                    if(!selectedH.isInStart() && !selectedH.isInCagePath(selectedH.row, selectedH.col)){
                         selectedH.currentPathIndex += dice.getValue();
                     }
                     if(selectedH.isInCageDoor(selectedH.row, selectedH.col)){
                         selectedH.currentCagePathIndex = 0;
                     }
                     if(selectedH.isInCagePath(selectedH.row, selectedH.col)){
-                        selectedH.currentCagePathIndex += dice.getValue();
+                        selectedH.currentCagePathIndex = dice.getValue();
                     }
-                    System.out.println("Current cage path index: " + selectedH.currentPathIndex);
-                    System.out.println("Current position: " + selectedH.row + ", " + selectedH.col);
-                    System.out.println("Old position: " + selectedH.oldRow + ", " + selectedH.oldCol);
+//                    System.out.println("Path length: " + selectedH.path.length);
+//                    System.out.println("Current path index: " + selectedH.currentPathIndex);
+//                    System.out.println("Cage path length: " + selectedH.cagePath.length);
+                    System.out.println("Current cage path index: " + selectedH.currentCagePathIndex);
                     changePlayer();
                 } else {
                     selectedH.moveTo(selectedH.getX(selectedH.oldRow), selectedH.getY(selectedH.oldCol));
                     selectedH.row = selectedH.oldRow;
                     selectedH.col = selectedH.oldCol;
-                    System.out.println("Current position: " + selectedH.row + ", " + selectedH.col);
-                    System.out.println("Old position: " + selectedH.oldRow + ", " + selectedH.oldCol);
+//                    System.out.println("Path length: " + selectedH.path.length);
+//                    System.out.println("Current path index: " + selectedH.currentPathIndex);
+//                    System.out.println("Cage path length: " + selectedH.cagePath.length);
+                    System.out.println("Current cage path index: " + selectedH.currentCagePathIndex);
                 }
                 selectedH = null;
             }
+        }
+        if (isGameOver()) {
+            gameOver = true;
+            System.out.println("Game Over!");
+            // Additional logic to handle game over state can be added here
         }
     }
     private void rollDice() {
         dice.rollWithAnimation(this, button, () -> {
             diceRolled = true;
 
-            if (allHorsesInCage() && dice.getValue() != 6 && dice.getValue() != 1) {
+            if (!isAnyHorseCanMove()) {
                 changePlayer();
             }
         });
     }
-    private boolean isValidTargetPosition(Horse selectedHorse,int[][] target){
-        return selectedHorse.row == target[0][0] && selectedHorse.col == target[0][1];
+    private boolean isGameOver() {
+        int[] teamCount = new int[5]; // Assuming team colors are 1 to 4
+
+        for (Horse horse : horses) {
+            if (horse.isInCagePath(horse.row, horse.col) && horse.currentCagePathIndex >= 3 && horse.currentCagePathIndex <= 6) {
+                teamCount[horse.team_color]++;
+            }
+        }
+
+        for (int i = 1; i <= 4; i++) {
+            if (teamCount[i] == 4) {
+                System.out.println("Team " + i + " wins!");
+                return true;
+            }
+        }
+
+        return false;
+    }
+    private boolean isHorseCorrectPosition(Horse selectedHorse,int[][] target){
+        return canMove(selectedHorse, target) && selectedHorse.row == target[0][0] && selectedHorse.col == target[0][1];
+    }
+    private boolean canMove(Horse selectedHorse, int[][] target){
+        // A horse is call moved if target position is not the same as current position
+        if (selectedHorse.oldRow == target[0][0] && selectedHorse.oldCol == target[0][1]){
+            System.out.println("Horse is not moved");
+            return false;
+        }
+        // A horse can move if the target position is not occupied by another horse of the same color except the horse itself
+        for (Horse horse : horses) {
+            if (horse.row == target[0][0] && horse.col == target[0][1] && horse.team_color == selectedHorse.team_color && horse != selectedHorse) {
+                System.out.println("There is a horse in the target position");
+                return false;
+            }
+        }
+        // A horse can move if there are no other horses in the way to the target position (if targetPathIndex is 3, it must be not any horse in position 1, 2)
+        if(!selectedHorse.isInCage(selectedHorse.oldRow, selectedHorse.oldCol)){
+            int targetPathIndex = selectedHorse.currentPathIndex + dice.getValue();
+            if (targetPathIndex < selectedHorse.path.length) {
+                for (int i = selectedHorse.currentPathIndex + 1; i < targetPathIndex; i++) {
+                    for (Horse horse : horses) {
+                        if (horse.row == selectedHorse.path[i][0] && horse.col == selectedHorse.path[i][1]) {
+                            System.out.println("There is a horse in the way");
+                            return false;
+                        }
+                    }
+                }
+            }
+        }
+        return true;
     }
     private int[][] tagetPosition(Horse selectedHorse, Dice dice){
         int[][] target = new int[1][2];
@@ -155,9 +214,21 @@ public class GamePanel extends JPanel implements Runnable{
         if(selectedHorse.isInCageDoor(currentRow, currentCol)){
             int[][] cagePath = selectedHorse.cagePath;
             int cagePathLength = cagePath.length;
-            if(selectedHorse.currentCagePathIndex + diceValue < cagePathLength){
-                targetRow = cagePath[selectedHorse.currentCagePathIndex + diceValue][0];
-                targetCol = cagePath[selectedHorse.currentCagePathIndex + diceValue][1];
+            if(selectedHorse.currentCagePathIndex + diceValue - 1 < cagePathLength){
+                targetRow = cagePath[selectedHorse.currentCagePathIndex + diceValue - 1][0];
+                targetCol = cagePath[selectedHorse.currentCagePathIndex + diceValue - 1][1];
+                target[0][0] = targetRow;
+                target[0][1] = targetCol;
+            }else {
+                target[0][0] = currentRow;
+                target[0][1] = currentCol;
+            }
+        }
+        if (selectedHorse.isInCagePath(currentRow, currentCol)){
+            int[][] cagePath = selectedHorse.cagePath;
+            if(diceValue > selectedHorse.currentCagePathIndex + 1){
+                targetRow = cagePath[diceValue - 1][0];
+                targetCol = cagePath[diceValue - 1][1];
                 target[0][0] = targetRow;
                 target[0][1] = targetCol;
 
@@ -166,31 +237,16 @@ public class GamePanel extends JPanel implements Runnable{
                 target[0][1] = currentCol;
             }
         }
-        if (selectedHorse.isInCagePath(currentRow, currentCol)){
-            int[][] cagePath = selectedHorse.cagePath;
-            int cagePathLength = cagePath.length;
-            if(selectedHorse.currentCagePathIndex + diceValue < cagePathLength){
-                targetRow = cagePath[selectedHorse.currentCagePathIndex + diceValue][0];
-                targetCol = cagePath[selectedHorse.currentCagePathIndex + diceValue][1];
-                target[0][0] = targetRow;
-                target[0][1] = targetCol;
-
-            }else {
-                target[0][0] = selectedHorse.cageRow;
-                target[0][1] = selectedHorse.cageCol;
-            }
-        }
-
         return target;
     }
 
-    private boolean allHorsesInCage() {
+    private boolean isAnyHorseCanMove() {
         for (Horse horse : horses) {
-            if (horse.team_color == current_turn && !horse.isInCage(horse.row, horse.col)) {
-                return false;
+            if (horse.team_color == current_turn && canMove(horse, tagetPosition(horse, dice))) {
+                return true;
             }
         }
-        return true;
+        return false;
     }
 
     private void changePlayer(){

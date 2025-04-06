@@ -1,6 +1,7 @@
 package org.example.horses;
 
 import org.example.Board;
+import org.example.GamePanel;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -58,7 +59,11 @@ public class Horse {
                 {0, 7}, {0, 8}, {1, 8}, {2, 8}, {3, 8}, {4, 8}, {5, 8}, {6, 8}, {6, 9}, {6, 10}, {6, 11}, {6, 12}, {6, 13},
                 {6, 14}, {7, 14}, {8, 14}, {8, 13}, {8, 12}, {8, 11}, {8, 10}, {8, 9}, {8, 8}, {9, 8}, {10, 8}, {11, 8},
                 {12, 8}, {13, 8}, {14, 8}, {14, 7}, {14, 6}, {13, 6}, {12, 6}, {11, 6}, {10, 6}, {9, 6}, {8, 6}, {8, 5},
-                {8, 4}, {8, 3}, {8, 2}, {8, 1}, {8, 0}, {7, 0}
+                {8, 4}, {8, 3}, {8, 2}, {8, 1}, {8, 0}, {7, 0},
+                {7, 1}, {7, 2}, {7, 3}, {7, 4}, {7, 5}, {7, 6},
+                {8, 7}, {9, 7}, {10, 7}, {11, 7}, {12, 7}, {13, 7},
+                {1, 7}, {2, 7}, {3, 7}, {4, 7}, {5, 7},
+                {7, 8}, {7, 9}, {7, 10}, {7, 11}, {7, 12}, {7, 13}
         };
 
         for (int[] pos : validPositions) {
@@ -67,6 +72,16 @@ public class Horse {
             }
         }
         return false;
+    }
+    public void moveToCage() {
+        this.x = getX(cageRow);
+        this.y = getY(cageCol);
+        this.row = cageRow;
+        this.col = cageCol;
+        this.currentPathIndex = 0;
+        this.currentCagePathIndex = 0;
+        this.oldRow = cageRow;
+        this.oldCol = cageCol;
     }
     public boolean isInCage(int row, int col) {
         return row == cageRow && col == cageCol;
@@ -83,6 +98,12 @@ public class Horse {
         return false;
     }
     public void updatePosition() {
+        for (Horse horse : GamePanel.horses) {
+            if (horse.row == this.row && horse.col == this.col && horse.team_color != this.team_color) {
+                horse.moveToCage();
+                break;
+            }
+        }
         x = getX(row);
         y = getY(col);
     }
