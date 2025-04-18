@@ -62,7 +62,7 @@ public class GamePanel extends JPanel implements Runnable{
         horses.add(new YellowHorse(10,10));
         horses.add(new YellowHorse(13,10));
         //Draw test horses
-        horses.add(new BlueHorse(7, 0, 1));
+//        horses.add(new BlueHorse(7, 0, 1));
     }
     private void update() {
         if (mouse.pressed && diceRolled) {

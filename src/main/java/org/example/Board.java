@@ -52,9 +52,9 @@ public class Board {
 
         // Vẽ điểm xuất chuồng
         g2.setColor(blue);
-        g2.fillOval(6 * SQUARE_SIZE + PADDING + 13, 0 * SQUARE_SIZE + PADDING + 13, SQUARE_SIZE - 26, SQUARE_SIZE - 26);
+        g2.fillOval(6 * SQUARE_SIZE + PADDING + 13, PADDING + 13, SQUARE_SIZE - 26, SQUARE_SIZE - 26);
         g2.setColor(green);
-        g2.fillOval(0 * SQUARE_SIZE + PADDING + 13, 8 * SQUARE_SIZE + PADDING + 13, SQUARE_SIZE - 26, SQUARE_SIZE - 26);
+        g2.fillOval(PADDING + 13, 8 * SQUARE_SIZE + PADDING + 13, SQUARE_SIZE - 26, SQUARE_SIZE - 26);
         g2.setColor(red);
         g2.fillOval(14 * SQUARE_SIZE + PADDING + 13, 6 * SQUARE_SIZE + PADDING + 13, SQUARE_SIZE - 26, SQUARE_SIZE - 26);
         g2.setColor(yellow);
@@ -62,13 +62,13 @@ public class Board {
 
         // Vẽ điểm nhập chuồng (điểm cuối)
         g2.setColor(blue);
-        drawArrow(g2, 7 * SQUARE_SIZE + PADDING + HALF_SQUARE_SIZE, 0 * SQUARE_SIZE + PADDING + HALF_SQUARE_SIZE - 10, 7 * SQUARE_SIZE + PADDING + HALF_SQUARE_SIZE, 0 * SQUARE_SIZE + PADDING + HALF_SQUARE_SIZE + 10, 10);
+        drawArrow(g2, 7 * SQUARE_SIZE + PADDING + HALF_SQUARE_SIZE, PADDING + HALF_SQUARE_SIZE - 10, 7 * SQUARE_SIZE + PADDING + HALF_SQUARE_SIZE, PADDING + HALF_SQUARE_SIZE + 10);
         g2.setColor(green);
-        drawArrow(g2, 0 * SQUARE_SIZE + PADDING + HALF_SQUARE_SIZE - 10, 7 * SQUARE_SIZE + PADDING + HALF_SQUARE_SIZE, 0 * SQUARE_SIZE + PADDING + HALF_SQUARE_SIZE + 10, 7 * SQUARE_SIZE + PADDING + HALF_SQUARE_SIZE, 10);
+        drawArrow(g2, PADDING + HALF_SQUARE_SIZE - 10, 7 * SQUARE_SIZE + PADDING + HALF_SQUARE_SIZE, PADDING + HALF_SQUARE_SIZE + 10, 7 * SQUARE_SIZE + PADDING + HALF_SQUARE_SIZE);
         g2.setColor(red);
-        drawArrow(g2, 14 * SQUARE_SIZE + PADDING + HALF_SQUARE_SIZE + 10, 7 * SQUARE_SIZE + PADDING + HALF_SQUARE_SIZE, 14 * SQUARE_SIZE + PADDING + HALF_SQUARE_SIZE - 10, 7 * SQUARE_SIZE + PADDING + HALF_SQUARE_SIZE, 10);
+        drawArrow(g2, 14 * SQUARE_SIZE + PADDING + HALF_SQUARE_SIZE + 10, 7 * SQUARE_SIZE + PADDING + HALF_SQUARE_SIZE, 14 * SQUARE_SIZE + PADDING + HALF_SQUARE_SIZE - 10, 7 * SQUARE_SIZE + PADDING + HALF_SQUARE_SIZE);
         g2.setColor(yellow);
-        drawArrow(g2, 7 * SQUARE_SIZE + PADDING + HALF_SQUARE_SIZE, 14 * SQUARE_SIZE + PADDING + HALF_SQUARE_SIZE + 10, 7 * SQUARE_SIZE + PADDING + HALF_SQUARE_SIZE, 14 * SQUARE_SIZE + PADDING + HALF_SQUARE_SIZE - 10, 10);
+        drawArrow(g2, 7 * SQUARE_SIZE + PADDING + HALF_SQUARE_SIZE, 14 * SQUARE_SIZE + PADDING + HALF_SQUARE_SIZE + 10, 7 * SQUARE_SIZE + PADDING + HALF_SQUARE_SIZE, 14 * SQUARE_SIZE + PADDING + HALF_SQUARE_SIZE - 10);
 
         // Vẽ viền bàn cờ tổng thể
         g2.setColor(Color.BLACK);
@@ -90,7 +90,7 @@ public class Board {
         g2.setColor(color);
         g2.fillRect(x, y, SQUARE_SIZE - 2, SQUARE_SIZE - 2);
 
-        drawCenteredNumber(g2, String.valueOf(number), col, row, 30, Color.WHITE);
+        drawCenteredNumber(g2, String.valueOf(number), col, row);
     }
 
     private void drawHorseCage(Graphics2D g2, Color color, int col, int row) {
@@ -102,7 +102,7 @@ public class Board {
         g2.drawOval( (col + 1) * SQUARE_SIZE + PADDING, (row + 1) * SQUARE_SIZE + PADDING, 4 * SQUARE_SIZE, 4 * SQUARE_SIZE);
     }
 
-    private static void drawArrow(Graphics2D g2, int x1, int y1, int x2, int y2, int arrowSize) {
+    private static void drawArrow(Graphics2D g2, int x1, int y1, int x2, int y2) {
         // Vẽ đường chính của mũi tên
         g2.drawLine(x1, y1, x2, y2);
 
@@ -110,20 +110,20 @@ public class Board {
         double angle = Math.atan2(y2 - y1, x2 - x1);
 
         // Tạo 2 điểm đầu mũi tên
-        int arrowX1 = (int) (x2 - arrowSize * Math.cos(angle - Math.PI / 6));
-        int arrowY1 = (int) (y2 - arrowSize * Math.sin(angle - Math.PI / 6));
-        int arrowX2 = (int) (x2 - arrowSize * Math.cos(angle + Math.PI / 6));
-        int arrowY2 = (int) (y2 - arrowSize * Math.sin(angle + Math.PI / 6));
+        int arrowX1 = (int) (x2 - 10 * Math.cos(angle - Math.PI / 6));
+        int arrowY1 = (int) (y2 - 10 * Math.sin(angle - Math.PI / 6));
+        int arrowX2 = (int) (x2 - 10 * Math.cos(angle + Math.PI / 6));
+        int arrowY2 = (int) (y2 - 10 * Math.sin(angle + Math.PI / 6));
 
         // Vẽ đầu mũi tên
         g2.drawLine(x2, y2, arrowX1, arrowY1);
         g2.drawLine(x2, y2, arrowX2, arrowY2);
     }
 
-    private void drawCenteredNumber(Graphics2D g2, String number, int col, int row, int fontSize, Color color) {
-        Font font = new Font("Arial", Font.BOLD, fontSize);
+    private void drawCenteredNumber(Graphics2D g2, String number, int col, int row) {
+        Font font = new Font("Arial", Font.BOLD, 30);
         g2.setFont(font);
-        g2.setColor(color);
+        g2.setColor(Color.WHITE);
 
         FontMetrics metrics = g2.getFontMetrics();
         int x = col * SQUARE_SIZE + PADDING + HALF_SQUARE_SIZE - metrics.stringWidth(number) / 2;

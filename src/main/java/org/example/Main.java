@@ -9,14 +9,12 @@ public class Main {
         window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         window.setResizable(false);
 
-        // Add GamePanel to the window
-        GamePanel gp = new GamePanel();
-        window.add(gp);
+        // Hiển thị menu chính
+        MainMenuPanel mainMenu = new MainMenuPanel(window);
+        window.add(mainMenu);
         window.pack();
 
         window.setLocationRelativeTo(null);
         window.setVisible(true);
-
-        gp.launchGame();
     }
 }
