@@ -5,7 +5,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 
 public class MainMenuPanel extends JPanel {
-    private JFrame frame;
+    private final JFrame frame;
 
     public MainMenuPanel(JFrame frame) {
         this.frame = frame;
@@ -35,7 +35,7 @@ public class MainMenuPanel extends JPanel {
         // Nút "Thoát"
         JButton exitButton = new JButton("Thoát");
         exitButton.setFont(new Font("Arial", Font.BOLD, 20));
-        exitButton.addActionListener(e -> System.exit(0));
+        exitButton.addActionListener(_ -> System.exit(0));
         gbc.gridy = 2;
         add(exitButton, gbc);
     }
@@ -51,15 +51,15 @@ public class MainMenuPanel extends JPanel {
 
     private void onGuide(ActionEvent e) {
         String guide = """
-        Trò chơi có thể chơi từ 2 đến 4 người. Mỗi người chơi có chuồng ngựa xuất phát riêng và có 4 con ngựa trong chuồng đó. 
-        Chuồng ngựa xuất phát có màu đỏ, xanh lá, vàng và xanh dương, nằm ở 4 góc của bàn cờ. 
-        Mục tiêu của mỗi người chơi là đưa ngựa của mình ra khỏi chuồng xuất phát và đua về chuồng đích an toàn. 
+        Trò chơi có thể chơi từ 2 đến 4 người. Mỗi người chơi có chuồng ngựa xuất phát riêng và có 4 con ngựa trong chuồng đó.
+        Chuồng ngựa xuất phát có màu đỏ, xanh lá, vàng và xanh dương, nằm ở 4 góc của bàn cờ.
+        Mục tiêu của mỗi người chơi là đưa ngựa của mình ra khỏi chuồng xuất phát và đua về chuồng đích an toàn.
         Mỗi chuồng đích có 6 vị trí và được đánh số từ 1 đến 6. Bốn con ngựa đầu tiên đến chuồng đích sẽ giành các vị trí 6, 5, 4 và 3 để chiến thắng.
 
         - Bạn cần ra số 1 hoặc 6 để ngựa bắt đầu xuất phát.
         - Nếu lắc được số 1 hoặc 6, bạn sẽ được lắc thêm lượt nữa.
         - Một ô chỉ có thể chứa 1 con ngựa cùng lúc.
-        - Bạn không thể đi qua con ngựa khác dù là của bạn hay đối thủ. 
+        - Bạn không thể đi qua con ngựa khác dù là của bạn hay đối thủ.
         - Bạn có thể đá ngựa đối thủ về chuồng nếu bạn lắc đúng số cần để đến vị trí đó.
         - Không có điểm an toàn cho ngựa, vì vậy ngựa có thể bị đá về chuồng bất cứ lúc nào.
         """;
